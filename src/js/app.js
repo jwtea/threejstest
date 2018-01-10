@@ -1,4 +1,5 @@
 window.THREE = require('three/build/three.js');
+
 require('three-fbx-loader')(THREE);
 
 var OrbitControls = require('three-orbit-controls')(THREE)
@@ -19,11 +20,11 @@ function init() {
   document.body.appendChild( container );
 
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-  camera.position.set( 100, 200, 300 );
+  camera.position.set( 0, 10, 50 );
 
-  controls = new OrbitControls( camera );
-  controls.target.set( 0, 100, 0 );
-  controls.update();
+  // controls = new OrbitControls( camera );
+  // controls.target.set( 0, 100, 0 );
+  // controls.update();
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color( 0xa0a0a0 );
@@ -39,6 +40,8 @@ function init() {
   light.shadow.camera.top = 180;
   light.shadow.camera.bottom = -100;
   light.shadow.camera.left = -120;
+  light.shadowMapWidth = 10000;
+  light.shadowMapHeight = 10000;
   light.shadow.camera.right = 120;
   scene.add( light );
 
@@ -58,8 +61,7 @@ function init() {
   // model
   var loader = new THREE.FBXLoader();
 
-  loader.load( 'src/models/atom.fbx', function ( object ) {
-    console.log('wow')
+  loader.load( 'src/models/golf_chip.fbx', function ( object ) {
     object.mixer = new THREE.AnimationMixer( object );
     mixers.push( object.mixer );
 
@@ -76,13 +78,18 @@ function init() {
       }
 
     } );
-
+    console.log('Adding to scene');
     scene.add( object );
 
-  } );
+  },(prog)=>{
+    console.log('prog:', prog)
+  },(err)=>{
+    console.log('error:', err)
+  });
 
 
   renderer = new THREE.WebGLRenderer();
+  renderer.shadowMapType = THREE.PCFSoftShadowMap;
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
   renderer.shadowMap.enabled = true;
